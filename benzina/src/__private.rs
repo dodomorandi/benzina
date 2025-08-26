@@ -98,4 +98,21 @@ pub mod deep_clone {
         impl_deep_clone_for_tuples!((T1, 0), (T2, 1), (T3, 2), (T4, 3), (T5, 4), (T6, 5), (T7, 6), (T8, 7), (T9, 8), (T10, 9), (T11, 10), (T12, 11), (T13, 12), (T14, 13), (T15, 14));
         impl_deep_clone_for_tuples!((T1, 0), (T2, 1), (T3, 2), (T4, 3), (T5, 4), (T6, 5), (T7, 6), (T8, 7), (T9, 8), (T10, 9), (T11, 10), (T12, 11), (T13, 12), (T14, 13), (T15, 14), (T16, 15));
     }
+
+    #[cfg(test)]
+    mod tests {
+        use super::{DeepClonePlain, DeepCloneRef, DeepCloneTuple, Wrap};
+
+        #[test]
+        #[expect(
+            clippy::needless_borrow,
+            reason = "we are testing that autoderef specialization is working"
+        )]
+        fn deep_clone_impl() {
+            let _: u32 = (&&Wrap(&0u32)).deep_clone();
+            let _: u32 = (&&Wrap(0u32)).deep_clone();
+            let _: (u32,) = (&&Wrap((&0u32,))).deep_clone();
+            let _: (u32, u32) = (&&Wrap((&0u32, &0u32))).deep_clone();
+        }
+    }
 }
